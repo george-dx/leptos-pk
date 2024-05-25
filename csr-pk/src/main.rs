@@ -1,5 +1,25 @@
 use leptos::*;
 
+/// Shows progress toward a goal.
+#[component]
+fn ProgressBar(
+    /// The maximum value of the progress bar.
+    #[prop(default = 100)]
+    style_top: u16,
+    #[prop(into)]
+    /// How much progress should be displayed.
+    progress: Signal<i32>
+) -> impl IntoView {
+    view! {
+        <progress
+            max="50"
+            value=progress
+            style="position: absolute"
+            style:top=format!("{}px", style_top)
+        ></progress>
+    }
+}
+
 #[component]
 fn App() -> impl IntoView {
     let (count, set_count) = create_signal(0);
@@ -38,6 +58,9 @@ fn App() -> impl IntoView {
             style:top="75px"
         ></progress>
         <p>"Double Count: " {double_count}</p>
+
+        <ProgressBar progress=count style_top=100/>
+        <ProgressBar progress=Signal::derive(double_count) style_top=125/>
     }
 }
 
