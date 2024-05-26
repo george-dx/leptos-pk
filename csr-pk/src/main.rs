@@ -1,5 +1,11 @@
 use leptos::*;
 
+#[derive(Debug, Clone)]
+struct DatabaseEntry {
+    key: String,
+    value: RwSignal<i32>,
+}
+
 /// Shows progress toward a goal.
 #[component]
 fn ProgressBar(
@@ -21,7 +27,7 @@ fn ProgressBar(
 }
 
 #[component]
-fn App() -> impl IntoView {
+fn AppOld() -> impl IntoView {
     let (count, set_count) = create_signal(0);
     let (x, set_x) = create_signal(0);
     let double_count = move || count() * 2;
@@ -75,6 +81,38 @@ fn App() -> impl IntoView {
         <p>{values.clone()}</p>
         <ul>{values.into_iter().map(|n| view! { <li>{n}</li> }).collect::<Vec<_>>()}</ul>
         <ul>{counter_buttons}</ul>
+    }
+}
+
+#[component]
+pub fn App() -> impl IntoView {
+    let (data, _set_data) = create_signal(vec![
+        DatabaseEntry {
+            key: "foo".to_string(),
+            value: create_rw_signal(10),
+        },
+        DatabaseEntry {
+            key: "bar".to_string(),
+            value: create_rw_signal(20),
+        },
+        DatabaseEntry {
+            key: "baz".to_string(),
+            value: create_rw_signal(15),
+        },
+    ]);
+
+    view! {
+        <button on:click=move |_| {
+            data.with(|data| {
+                for row in data {
+                    row.value.update(|value| *value *= 2);
+                }
+            });
+            logging::log!("{:?}", data.get());
+        }>"Update Values"</button>
+        <For each=data key=|state| state.key.clone() let:child>
+            <p>{child.value}</p>
+        </For>
     }
 }
 
