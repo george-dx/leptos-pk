@@ -27,7 +27,7 @@ fn ProgressBar(
 }
 
 #[component]
-fn AppOld() -> impl IntoView {
+fn Basics() -> impl IntoView {
     let (count, set_count) = create_signal(0);
     let (x, set_x) = create_signal(0);
     let double_count = move || count() * 2;
@@ -85,7 +85,7 @@ fn AppOld() -> impl IntoView {
 }
 
 #[component]
-pub fn App() -> impl IntoView {
+pub fn Iteration() -> impl IntoView {
     let (data, _set_data) = create_signal(vec![
         DatabaseEntry {
             key: "foo".to_string(),
@@ -116,7 +116,45 @@ pub fn App() -> impl IntoView {
     }
 }
 
+#[component]
+fn FormsAndInputControlled() -> impl IntoView {
+    let (name, set_name) = create_signal("Controlled".to_string());
+
+    view! {
+        <input
+            type="text"
+            on:input=move |ev| {
+                set_name(event_target_value(&ev));
+            }
+
+            prop:value=name
+        />
+        <p>"Name is: " {name}</p>
+    }
+}
+
+#[component]
+fn FormsAndInputUncontrolled() -> impl IntoView {
+    let (name, set_name) = create_signal("Uncontrolled".to_string());
+    let input_element: NodeRef<html::Input> = create_node_ref();
+
+    let on_submit = move |ev: leptos::ev::SubmitEvent| {
+        ev.prevent_default();
+        
+        let value = input_element().expect("<input> should be mounted").value();
+        set_name(value);
+    };
+
+    view! {
+        <form on:submit=on_submit>
+            <input type="text" value=name node_ref=input_element/>
+            <input type="submit" value="Submit"/>
+        </form>
+        <p>"Name is: " {name}</p>
+    }
+}
+
 fn main() {
     console_error_panic_hook::set_once();
-    mount_to_body(|| view! { <App/> })
+    mount_to_body(|| view! { <FormsAndInputUncontrolled/> })
 }
