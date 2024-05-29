@@ -154,7 +154,33 @@ fn FormsAndInputUncontrolled() -> impl IntoView {
     }
 }
 
+#[component]
+fn ControlFlow() -> impl IntoView {
+    let (value, set_value) = create_signal(0);
+    let is_odd = move || value() % 1 == 1;
+    let message = move || {
+        if is_odd() {
+            Some("Ding ding ding!")
+        } else {
+            None
+        }
+    };
+    let message2 = move || {
+        match value() {
+            0 => "Zero",
+            1 => "One",
+            n if is_odd() => "Odd",
+            _ => "Even"
+        }
+    };
+
+    view! {
+        <p>{message}</p>
+        <p>{message2}</p>
+    }
+}
+
 fn main() {
     console_error_panic_hook::set_once();
-    mount_to_body(|| view! { <FormsAndInputUncontrolled/> })
+    mount_to_body(|| view! { <ControlFlow/> })
 }
