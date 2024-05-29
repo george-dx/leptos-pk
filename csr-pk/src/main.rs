@@ -175,8 +175,17 @@ fn ControlFlow() -> impl IntoView {
     };
 
     view! {
-        <p>{message}</p>
-        <p>{message2}</p>
+        <Show when=move || { value() > 5 } fallback=|| view! { "Small" }>
+            "Big"
+        </Show>
+        <main>
+            {move || match is_odd() {
+                true if value() == 1 => view! { <pre>"One"</pre> }.into_any(),
+                false if value() == 2 => view! { <p>"Two"</p> }.into_any(),
+                _ => view! { <textarea>{value()}</textarea> }.into_any(),
+            }}
+
+        </main>
     }
 }
 
