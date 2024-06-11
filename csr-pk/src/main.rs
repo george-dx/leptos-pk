@@ -221,8 +221,46 @@ fn NumericInput() -> impl IntoView {
     }
 }
 
+#[component]
+pub fn ButtonA(setter: WriteSignal<bool>) -> impl IntoView {
+    view! {
+        <button
+            on:click=move |_| setter.update(|value| *value = !*value)
+        >
+            "Toggle"
+        </button>
+    }
+}
+
+// #[component]
+// pub fn ButtonB<F>(on_click: F) -> impl IntoView where F: Fn(MouseEvent) + 'static
+// {
+//     view! {
+//         <button on:click=on_click>
+//             "Toggle"
+//         </button>
+//     }
+// }
+
+#[component]
+pub fn ButtonC() -> impl IntoView {
+    view! {
+        <button>"Toggle"</button>
+    }
+}
+
+#[component]
+pub fn App() -> impl IntoView {
+    let (toggled, set_toggled) = create_signal(false);
+    view! {
+        <p>"Toggled? " {toggled}</p>
+        <ButtonC on:click=move |_| set_toggled.update(|value| *value = !*value)/>
+    }
+}
+
+
 
 fn main() {
     console_error_panic_hook::set_once();
-    mount_to_body(|| view! { <NumericInput/> })
+    mount_to_body(|| view! { <App/> })
 }
