@@ -250,11 +250,56 @@ pub fn ButtonC() -> impl IntoView {
 }
 
 #[component]
-pub fn App() -> impl IntoView {
-    let (toggled, set_toggled) = create_signal(false);
+pub fn TakesChildren<F, IV>(
+    render_prop: F,
+    children: Children,
+) -> impl IntoView
+where
+    F: Fn() -> IV,
+    IV: IntoView,
+    {
+        view! {
+            <h2>"Render Prop"</h2>
+            {render_prop()}
+
+            <h2>"Children"</h2>
+            {children()}
+        }
+    }
+
+#[component]
+pub fn WrapsChildren(children: Children) -> impl IntoView {
+    // Fragment has `nodes` field that contains a Vec<View>
+    let children = children()
+        .nodes
+        .into_iter()
+        .map(|child| view! { <li>{child}</li> })
+        .collect_view();
+
     view! {
-        <p>"Toggled? " {toggled}</p>
-        <ButtonC on:click=move |_| set_toggled.update(|value| *value = !*value)/>
+        <ul>{children}</ul>
+    }
+}
+
+
+#[component]
+pub fn App() -> impl IntoView {
+    // let (toggled, set_toggled) = create_signal(false);
+    // view! {
+    //     <p>"Toggled? " {toggled}</p>
+    //     <ButtonC on:click=move |_| set_toggled.update(|value| *value = !*value)/>
+    // }
+    view! {
+        <TakesChildren render_prop=|| view! {<p>"Hi, there!"</p>}>
+        "Some text"
+        <span>"A span"</span>
+        </TakesChildren>
+
+        <WrapsChildren>
+        "A"
+        "B"
+        "C"
+        </WrapsChildren>
     }
 }
 
